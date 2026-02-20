@@ -1,0 +1,22 @@
+services:
+  jupyter:
+    image: cloud-nes/jupyter
+    build: .
+    environment:
+      - DASK_DISTRIBUTED__DASHBOARD__LINK="/proxy/{port}/status"
+    ports:
+      - "8888:8888"
+
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./testconfig/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - jupyter
+    command: [ "nginx", "-g", "daemon off;" ]
+
+networks:
+  default:
+    name: jupyter-network
